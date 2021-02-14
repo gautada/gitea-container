@@ -1,0 +1,2 @@
+#!/bin/sh
+docker exec -it gitea /usr/bin/gitea --version | cut -d' ' -f3

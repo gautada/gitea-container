@@ -1,21 +1,21 @@
-FROM alpine:3.12.1 as config-alpine
+FROM alpine:3.13 as config-alpine
 
 RUN apk add --no-cache tzdata
 
 RUN cp -v /usr/share/zoneinfo/America/New_York /etc/localtime
 RUN echo "America/New_York" > /etc/timezone
 
-FROM alpine:edge as src-gitea
+FROM alpine:3.13 as src-gitea
 
 RUN apk add --no-cache bash build-base git go nodejs npm
 
-RUN git clone --branch v1.13.0 --depth 1 https://github.com/go-gitea/gitea.git
+RUN git clone --branch v1.13.2 --depth 1 https://github.com/go-gitea/gitea.git
 
 WORKDIR /gitea
 
 RUN TAGS="bindata" make build
 
-FROM alpine:3.12.1
+FROM alpine:3.13
 
 COPY --from=config-alpine /etc/localtime /etc/localtime
 COPY --from=config-alpine /etc/timezone  /etc/timezone
@@ -40,11 +40,11 @@ RUN addgroup git \
 #  && chown -R git:git /etc/gitea \
 #  && chmod -R 770 /etc/gitea 
 
-COPY app.ini /etc/gitea/app.ini
+# COPY app.ini /etc/gitea/app.ini
 RUN chown -R git:git /etc/gitea \
  && chmod -R 770 /etc/gitea
 
-COPY key-git.pub /home/git/.ssh/authorized_keys
+# COPY key-git.pub /home/git/.ssh/authorized_keys
 
 USER git
 WORKDIR /opt/gitea-data
