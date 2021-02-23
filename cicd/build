@@ -1,14 +1,12 @@
 #!/bin/sh
 export DOCKER_HOST=192.168.4.200 
 docker build --tag gitea:build . --no-cache \
- && docker run -d --rm --name cicd-gitea gitea:build \
- && ./test $DOCKER_HOST \
- && docker stop cicd-gitea
+ && docker run -d --rm --name gitea gitea:build \
+ && docker stop gitea
 export DOCKER_HOST=192.168.4.204
 docker build --tag gitea:build . --no-cache \   
- && docker run -d --rm --name cicd-gitea gitea:build \                                                                                                                         
- && ./test $DOCKER_HOST \
- && docker stop cicd-gitea
+ && docker run -d --rm --name gitea gitea:build \                                                                                                                         
+ && docker stop gitea
 
 
 
