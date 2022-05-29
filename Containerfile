@@ -49,7 +49,7 @@ LABEL description="A gitea container"
 # ╭――――――――――――――――――――╮
 # │ PORTS              │
 # ╰――――――――――――――――――――╯
-EXPOSE 3000/tcp
+EXPOSE 8080/tcp
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
