@@ -23,6 +23,8 @@
 docker build --build-arg ALPINE_VERSION=3.15.4 --build-arg GITEA_VERSION=v1.16.8 --file Containerfile --tag gitea:dev .
 ```
 
-
+```
+ docker run --detach --name gitea --publish 8082:8080 --volume ~/Workspace/gitea/gitea-container:/opt/gitea --rm gautada/gitea:1.16.8 
+ ```
 
  
