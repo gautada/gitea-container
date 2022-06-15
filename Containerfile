@@ -52,11 +52,21 @@ LABEL description="A gitea container"
 EXPOSE 8080/tcp
 
 # ╭――――――――――――――――――――╮
+# │ ENTRYPOINT         │
+# ╰――――――――――――――――――――╯
+COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
+
+# ╭――――――――――――――――――――╮
+# │ BACKUP             │
+# ╰――――――――――――――――――――╯
+COPY container-backup.fnc /etc/backup/container-backup.fnc
+
+# ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
 COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.ini
-COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
+
 
 # ╭――――――――――――――――――――╮
 # │ USER               │
