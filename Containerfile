@@ -73,14 +73,12 @@ COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.ini
 # ╰――――――――――――――――――――╯
 ARG USER=gitea
 VOLUME /opt/$USER
-
 RUN /bin/mkdir -p /opt/$USER/custom /opt/$USER/data /opt/$USER/log /opt/$USER/repos \
  && /usr/sbin/addgroup $USER \
  && /usr/sbin/adduser -D -s /bin/ash -G $USER $USER \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd \
- && /bin/chown $USER:$USER -R /opt/$USER
-
+ && /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
 USER $USER
 WORKDIR /home/$USER
 
