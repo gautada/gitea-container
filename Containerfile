@@ -72,7 +72,7 @@ COPY container-backup.fnc /etc/container/backup.fnc
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache git
+RUN apk add --no-cache bash git
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
 COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.example.ini
 RUN mkdir -p /etc/gitea \
