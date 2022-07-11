@@ -60,6 +60,11 @@ RUN /usr/sbin/addgroup -g $GID $USER \
 EXPOSE 8080/tcp
 
 # ╭――――――――――――――――――――╮
+# │ CONFIG             │
+# ╰――――――――――――――――――――╯
+RUN ln -s /etc/container/configmap.d /etc/gitea
+
+# ╭――――――――――――――――――――╮
 # │ ENTRYPOINT         │
 # ╰――――――――――――――――――――╯
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
@@ -67,7 +72,7 @@ COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
 # ╭――――――――――――――――――――╮
 # │ BACKUP             │
 # ╰――――――――――――――――――――╯
-COPY container-backup.fnc /etc/container/backup.fnc
+COPY backup.fnc /etc/container/backup.d/backup.fnc
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
