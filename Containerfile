@@ -1,9 +1,9 @@
-ARG ALPINE_VERSION=3.15.4
+ARG ALPINE_VERSION=3.16.2
 
 # ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
-# │                                                                         │
-# │ STAGE 1: src-postgres - Build postgres from source                      │
-# │                                                                         │
+# │                                                                          │
+# │ STAGE 1: srcgitea - Buildgiteas from source                              │
+# │                                                                          │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-gitea
 
@@ -57,7 +57,12 @@ RUN /usr/sbin/addgroup -g $GID $USER \
 # ╭――――――――――――――――――――╮
 # │ PORTS              │
 # ╰――――――――――――――――――――╯
-EXPOSE 8080/tcp
+EXPOSE 8080/tcp 22/tcp
+
+# ╭――――――――――――――――――――╮
+# │ SUDO               │
+# ╰――――――――――――――――――――╯
+COPY wheel-gitea /etc/container/wheel.d/wheel-gitea
 
 # ╭――――――――――――――――――――╮
 # │ CONFIG             │
