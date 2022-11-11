@@ -1,56 +1,105 @@
-ARG ALPINE_TAG=3.14.1
-FROM alpine:$ALPINE_TAG as config-alpine
+ARG ALPINE_VERSION=3.16.2
 
-RUN apk add --no-cache tzdata
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                          │
+# │ STAGE 1: srcgitea - Buildgiteas from source                              │
+# │                                                                          │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION as src-gitea
 
-RUN cp -v /usr/share/zoneinfo/America/New_York /etc/localtime
-RUN echo "America/New_York" > /etc/timezone
+# ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG GITEA_VERSION=1.16.8
+ARG GITEA_BRANCH=v"$GITEA_VERSION"
 
-FROM alpine:$ALPINE_TAG as src-gitea
-
-ARG BRANCH=v0.0.0
-
+# ╭――――――――――――――――――――╮
+# │ PACKAGES           │
+# ╰――――――――――――――――――――╯
 RUN apk add --no-cache bash build-base git go nodejs npm
 
-RUN git clone --branch $BRANCH --depth 1 https://github.com/go-gitea/gitea.git
+# ╭――――――――――――――――――――╮
+# │ SOURCE             │
+# ╰――――――――――――――――――――╯
+RUN git clone --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea.git
 
+# ╭――――――――――――――――――――╮
+# │ BUILD              │
+# ╰――――――――――――――――――――╯
 WORKDIR /gitea
-
 RUN TAGS="bindata" make build
 
-FROM alpine:$ALPINE_TAG
+# ╭―----------------------------------------------------------------------- -╮
+# │                                                                         │
+# │ STAGE 3: gitea-container                                                │
+# │                                                                         │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION
 
-COPY --from=config-alpine /etc/localtime /etc/localtime
-COPY --from=config-alpine /etc/timezone  /etc/timezone
+# ╭――――――――――――――――――――╮
+# │ METADATA           │
+# ╰――――――――――――――――――――╯
+LABEL source="https://github.com/gautada/gitea-container.git"
+LABEL maintainer="Adam Gautier <adam@gautier.org>"
+LABEL description="A gitea container"
 
-EXPOSE 8080
+# ╭――――――――――――――――――――╮
+# │ USER               │
+# ╰――――――――――――――――――――╯
+ARG UID=1001
+ARG GID=1001
+ARG USER=gitea
+RUN /usr/sbin/addgroup -g $GID $USER \
+ && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
+ && /usr/sbin/usermod -aG wheel $USER \
+ && /bin/echo "$USER:$USER" | chpasswd
+ 
+# ╭――――――――――――――――――――╮
+# │ PORTS              │
+# ╰――――――――――――――――――――╯
+EXPOSE 8080/tcp 22/tcp
 
+# ╭――――――――――――――――――――╮
+# │ SUDO               │
+# ╰――――――――――――――――――――╯
+COPY wheel-gitea /etc/container/wheel.d/wheel-gitea
+
+# ╭――――――――――――――――――――╮
+# │ CONFIG             │
+# ╰――――――――――――――――――――╯
+RUN ln -s /etc/container/configmap.d /etc/gitea
+
+# ╭――――――――――――――――――――╮
+# │ ENTRYPOINT         │
+# ╰――――――――――――――――――――╯
+COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
+
+# ╭――――――――――――――――――――╮
+# │ BACKUP             │
+# ╰――――――――――――――――――――╯
+COPY backup.fnc /etc/container/backup.d/backup.fnc
+
+# ╭――――――――――――――――――――╮
+# │ APPLICATION        │
+# ╰――――――――――――――――――――╯
 RUN apk add --no-cache bash git
-
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
-COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.ini
+COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.example.ini
+RUN mkdir -p /etc/gitea \
+ && ln -s /opt/gitea/custom/conf/app.ini /etc/gitea/app.ini
 
-RUN addgroup git \
- && adduser -D -s /bin/bash -G git git \
- && echo 'git:git' | chpasswd \
- && mkdir -p /opt/gitea-data/custom \
- && mkdir -p /opt/gitea-data/data \
- && mkdir -p /opt/gitea-data/log \
- && mkdir -p /opt/gitea-data/repos \
- && chown -R git:git /opt/gitea-data \
- && chmod -R 750 /opt/gitea-data 
-#  && mkdir -p /etc/gitea \
-#  && chown -R git:git /etc/gitea \
-#  && chmod -R 770 /etc/gitea 
 
-# COPY app.ini /etc/gitea/app.ini
-RUN chown -R git:git /etc/gitea \
- && chmod -R 770 /etc/gitea
+# ╭――――――――――――――――――――╮
+# │ FOLDERS            │
+# ╰――――――――――――――――――――╯
+RUN /bin/mkdir -p /opt/$USER/custom /opt/$USER/data /opt/$USER/log /opt/$USER/repos
+RUN /bin/mkdir -p /opt/$USER \
+ && /bin/chown -R $USER:$USER /opt/$USER /var/backup /tmp/backup /opt/backup
+# RUN /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
 
-# COPY key-git.pub /home/git/.ssh/authorized_keys
-
-USER git
-WORKDIR /opt/gitea-data
-
-ENTRYPOINT ["/usr/bin/gitea", "--config", "/opt/gitea-data/app.ini", "--work-path", "/opt/gitea-data", "--custom-path", "/opt/gitea-data/cusom"]
-CMD ["web", "--port", "8080"]
+# ╭――――――――――――――――――――╮
+# │ SETTINGS           │
+# ╰――――――――――――――――――――╯
+USER $USER
+WORKDIR /home/$USER
+VOLUME /opt/$USER
