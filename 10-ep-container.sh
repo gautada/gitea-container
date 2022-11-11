@@ -8,7 +8,7 @@ TEST="$(/usr/bin/pgrep gitea)"
 if [ $? -eq 1 ] ; then
  echo "---------- [ GIT SERVER(gitea) ] ----------"
  if [ -z "$ENTRYPOINT_PARAMS" ] ; then
-  /usr/bin/sudo /usr/bin/gitea --config /etc/gitea/app.ini --work-path /opt/gitea --custom-path /opt/gitea/custom web
+  /usr/bin/gitea --config /etc/gitea/app.ini --work-path /opt/gitea --custom-path /opt/gitea/custom web
  fi
 fi
 
