@@ -82,7 +82,7 @@ COPY backup.fnc /etc/container/backup.d/backup.fnc
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache bash git
+RUN apk add --no-cache bash git openssh-client
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
 COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.example.ini
 RUN mkdir -p /etc/gitea \
