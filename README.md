@@ -2,16 +2,52 @@
 
 [gitea](https://gitea.io/en-us/)  Gitea is a community managed lightweight code hosting solution.
 
-## Change Log
+Features
 
-- [September 10, 2021](https://github.com/go-gitea/gitea/tags/v1.15.2) - First  version is 1.15.2 as tag v1.15.2
-- [May 25, 2022](https://github.com/go-gitea/gitea/releases/tag/v1.16.8) - Updated version is 1.16.8 as tag v1.16.8
+- **git** - Provides a complete git host
 
-## Links
+### Feature Detail
 
-- [Backup and Restore](https://docs.gitea.io/en-us/backup-and-restore/)
+{ Provide specific details regarding the feature }
+
+## Development | Testing | Deploy
+
+Converted to `docker compose`
+
+## Architecture
+
+### Context
+
+### Container
+
+### Components
+
+## Administration
+
+### Checklist
+
+- [ X ] README conforms to the [gist](https://gist.github.com/gautada/ec549c846e8e50daf355d01b06eb0665)
+- [ ] .gitignore conforms to the [gist](https://gist.github.com/gautada/3a0a4a76d3c7e4539e71fc02c7f599ad)
+- [ ] Confirm the drone.yml file
+- [ ] Volume folders are present (development-volume & backup-volume)
+- [ ] docker-compose(.yml) works
+- [ ] Manifst folder present (and origin to private repository is correct
+- [ ] Issue List is linked to proper URI
+- [ ] Signoff ({date and signature of last check})
+- [ ] Confirm backup (maybe add to testing layer)
+- [ ] Confirm healthcheck (maybe add to testing layer)
+- [ ] Regenerate all architecture images
+
+
+### Issues
+
+The official to list is kept in a [GitHub Issue List]{(https://github.com/gautada/{repo}/issues)}
 
 ## Notes
+
+- Change origin on git repo: `git remote set-url origin https://git.gautier.org/kubernetes/gitea-manifest.git `
+
+
 
 
 

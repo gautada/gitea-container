@@ -1,9 +1,9 @@
 ARG ALPINE_VERSION=3.16.2
 
 # ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
-# │                                                                          │
-# │ STAGE 1: srcgitea - Buildgiteas from source                              │
-# │                                                                          │
+# │                                                                           │
+# │ STAGE 1: src-gitea - Build gitea from source                              │
+# │                                                                           │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-gitea
 
@@ -29,7 +29,7 @@ RUN git clone --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea
 WORKDIR /gitea
 RUN TAGS="bindata" make build
 
-# ╭―----------------------------------------------------------------------- -╮
+# ╭―------------------------------------------------------------------------╮
 # │                                                                         │
 # │ STAGE 3: gitea-container                                                │
 # │                                                                         │
@@ -44,62 +44,58 @@ LABEL maintainer="Adam Gautier <adam@gautier.org>"
 LABEL description="A gitea container"
 
 # ╭――――――――――――――――――――╮
-# │ USER               │
+# │ STANDARD CONFIG    │
 # ╰――――――――――――――――――――╯
+
+# USER:
+ARG USER=gitea
+
 ARG UID=1001
 ARG GID=1001
-ARG USER=gitea
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd
- 
-# ╭――――――――――――――――――――╮
-# │ PORTS              │
-# ╰――――――――――――――――――――╯
-EXPOSE 8080/tcp 22/tcp
 
-# ╭――――――――――――――――――――╮
-# │ SUDO               │
-# ╰――――――――――――――――――――╯
-COPY wheel-gitea /etc/container/wheel.d/wheel-gitea
+# PRIVILEGE:
+COPY wheel  /etc/container/wheel
 
-# ╭――――――――――――――――――――╮
-# │ CONFIG             │
-# ╰――――――――――――――――――――╯
-RUN ln -s /etc/container/configmap.d /etc/gitea
+# BACKUP:
+COPY backup /etc/container/backup
 
-# ╭――――――――――――――――――――╮
-# │ ENTRYPOINT         │
-# ╰――――――――――――――――――――╯
-COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
+# ENTRYPOINT:
+RUN /bin/rm -v /etc/container/entrypoint
+COPY entrypoint /etc/container/entrypoint
 
-# ╭――――――――――――――――――――╮
-# │ BACKUP             │
-# ╰――――――――――――――――――――╯
-COPY backup.fnc /etc/container/backup.d/backup.fnc
+# FOLDERS
+RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
+ && /bin/chown -R $USER:$USER /mnt/volumes/backup \
+ && /bin/chown -R $USER:$USER /var/backup \
+ && /bin/chown -R $USER:$USER /tmp/backup
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache bash git openssh-client
+RUN /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
+ && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini \
+ && /bin/ln -fsv /mnt/volumes/container /opt/gitea
+ 
+RUN /sbin/apk add --no-cache bash git openssh-client
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
 COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.example.ini
-RUN mkdir -p /etc/gitea \
- && ln -s /opt/gitea/custom/conf/app.ini /etc/gitea/app.ini
 
-
-# ╭――――――――――――――――――――╮
-# │ FOLDERS            │
-# ╰――――――――――――――――――――╯
-RUN /bin/mkdir -p /opt/$USER/custom /opt/$USER/data /opt/$USER/log /opt/$USER/repos
-RUN /bin/mkdir -p /opt/$USER \
- && /bin/chown -R $USER:$USER /opt/$USER /var/backup /tmp/backup /opt/backup
-# RUN /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
+RUN /bin/mkdir -p /mnt/volumes/container/custom \
+ && /bin/mkdir -p /mnt/volumes/container/data \
+ && /bin/mkdir -p /mnt/volumes/container/log \
+ && /bin/mkdir -p /mnt/volumes/container/repos
 
 # ╭――――――――――――――――――――╮
 # │ SETTINGS           │
 # ╰――――――――――――――――――――╯
 USER $USER
+VOLUME /mnt/volumes/backup
+VOLUME /mnt/volumes/configmaps
+VOLUME /mnt/volumes/container
+EXPOSE 8080/tcp
 WORKDIR /home/$USER
-VOLUME /opt/$USER
+

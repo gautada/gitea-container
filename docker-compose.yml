@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  gitea:
+    build:
+      args:
+        ALPINE_VERSION: "latest"
+        GITEA_VERSION: "1.17.3"
+      context: .
+      dockerfile: Containerfile
+      no_cache: true
+      tags:
+        - "gitea:dev"
+    image: "gitea:dev"
+    ports:
+      - "8080:8080"
+    volumes:
+      - "container:/mnt/volumes/container"
+      - "backup:/mnt/volumes/backup"
+        
+volumes:
+  container:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/mada/Workspace/gitea/container-volume
+  backup:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/mada/Workspace/gitea/backup-volume
+      
