@@ -3,7 +3,7 @@ services:
   gitea:
     build:
       args:
-        ALPINE_VERSION: "3.16.2"
+        ALPINE_VERSION: "latest"
         GITEA_VERSION: "1.17.3"
       context: .
       dockerfile: Containerfile
@@ -14,16 +14,16 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - "development:/opt/gitea"
-      - "backup:/opt/backup"
+      - "container:/mnt/volumes/container"
+      - "backup:/mnt/volumes/backup"
         
 volumes:
-  development:
+  container:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /Users/mada/Workspace/gitea/development-volume
+      device: /Users/mada/Workspace/gitea/container-volume
   backup:
     driver: local
     driver_opts:
