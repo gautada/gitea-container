@@ -4,7 +4,7 @@
 
 Features
 
-- **git** - Provides a complete git host
+- **git** - Provides a complete git host.
 
 ### Feature Detail
 
