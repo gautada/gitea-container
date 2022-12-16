@@ -41,7 +41,7 @@ Converted to `docker compose`
 
 ### Issues
 
-The official to list is kept in a [GitHub Issue List]{(https://github.com/gautada/{repo}/issues)}
+The official to list is kept in a [GitHub Issue List](https://github.com/gautada/gitea-container/issues)
 
 ## Notes
 
