@@ -76,9 +76,12 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
- && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini \
- && /bin/ln -fsv /mnt/volumes/container /opt/gitea
+
+RUN /bin/mkdir /etc/gitea \
+ && /bin/ln -fsv /etc/container/app.ini /etc/gitea/app.ini \
+ && /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
+ && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini
+
  
 RUN /sbin/apk add --no-cache bash git openssh-client
 COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
