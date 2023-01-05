@@ -81,7 +81,7 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 RUN /bin/mkdir -p /etc/gitea /opt/gitea \
  && /bin/ln -fsv /etc/container/app.ini /etc/gitea/app.ini \
  && /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
- && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini
+ && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini \
  && /bin/ln -fsv /etc/container/app.ini /opt/gitea/app.ini
  
 RUN /sbin/apk add --no-cache bash git openssh-client
