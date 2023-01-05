@@ -77,7 +77,7 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 
-# /opt/gitea and /etc/gitea are needed for legacy support (mostly webhooks). 
+# /opt/gitea and /etc/gitea are needed for legacy support (mostly webhooks).
 RUN /bin/mkdir -p /etc/gitea /opt/gitea \
  && /bin/ln -fsv /etc/container/app.ini /etc/gitea/app.ini \
  && /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
