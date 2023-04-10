@@ -4,7 +4,7 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        GITEA_VERSION: "1.17.3"
+        GITEA_VERSION: "1.19.0"
       context: .
       dockerfile: Containerfile
       no_cache: true
