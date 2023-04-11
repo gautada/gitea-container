@@ -14,19 +14,11 @@ app_version() {
 }
 
 app_entrypoint() {
-if [ -z "$@" ] ; then
-  log "-i" "entrypoint" "default"
-  /usr/bin/pgrep gitea > /dev/null
-  TEST=$?
-  if [ $TEST -eq 1 ] ; then
-   log "-i" "entrypoint" "Blocking application - gitea($(app_version))"
-   /usr/bin/gitea --config /etc/container/app.ini --work-path /mnt/volumes/container --custom-path /mnt/volumes/container/custom web
-  fi
-  return 1
-else
- log "-i" "entrypoint" "Override default($ENTRYPOINT_PARAMS)"
- log "-i" "entrypoint" "Detatched application - gitea($(app_version))"
- /usr/bin/gitea --config /etc/container/app.ini --work-path /mnt/volumes/container --custom-path /mnt/volumes/container/custom web >> /mnt/volumes/container/log/override.log 2>&1 &
- return 0
-fi
+ log "-i" "entrypoint" "default"
+ /usr/bin/pgrep gitea > /dev/null
+ TEST=$?
+ if [ $TEST -eq 1 ] ; then
+  log "-i" "entrypoint" "Blocking application - gitea($(app_version))"
+  /usr/bin/gitea --config /etc/container/app.ini --work-path /mnt/volumes/container --custom-path /mnt/volumes/container/custom web
+ fi
 }
