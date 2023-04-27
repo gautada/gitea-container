@@ -10,8 +10,8 @@ services:
       dockerfile: Containerfile
       no_cache: true
       tags:
-        - "gitea:dev"
-    image: "gitea:dev"
+        - "gitea:build"
+    image: "gautada/gitea:build"
     ports:
       - "8080:8080"
     volumes:
