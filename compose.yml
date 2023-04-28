@@ -4,13 +4,14 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
+        CONTAINER_VERSION: "1.19.0"
         GITEA_VERSION: "1.19.0"
       context: .
       dockerfile: Containerfile
       no_cache: true
       tags:
-        - "gitea:dev"
-    image: "gitea:dev"
+        - "gitea:build"
+    image: "gautada/gitea:build"
     ports:
       - "8080:8080"
     volumes:
