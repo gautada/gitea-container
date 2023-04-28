@@ -11,6 +11,7 @@ steps:
 - name: build
   commands:
   - /usr/bin/podman-compose build --no-cache
+  - /usr/bin/podman-compose images
   
 - name: test
   environment:
