@@ -12,6 +12,8 @@ services:
       tags:
         - "gitea:build"
     image: "gautada/gitea:build"
+    environment:
+      - SYSTEM_ENVIRONMENT=DEVELOPMENT
     ports:
       - "8080:8080"
     volumes:

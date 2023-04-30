@@ -14,11 +14,12 @@ app_version() {
 }
 
 app_entrypoint() {
- log "-i" "entrypoint" "default"
- /usr/bin/pgrep gitea > /dev/null
- TEST=$?
- if [ $TEST -eq 1 ] ; then
-  log "-i" "entrypoint" "Blocking application - gitea($(app_version))"
-  /usr/bin/gitea --config /etc/container/app.ini --work-path /mnt/volumes/container --custom-path /mnt/volumes/container/custom web
- fi
+ # log "-i" "entrypoint" "default"
+ # /usr/bin/pgrep gitea > /dev/null
+ # TEST=$?
+ # if [ $TEST -eq 1 ] ; then
+ # log "-i" "entrypoint" "Blocking application - gitea($(app_version))"
+ tail -f /dev/null
+ $ /usr/bin/gitea --config /etc/container/app.ini --work-path /mnt/volumes/container --custom-path /mnt/volumes/container/custom web
+ # fi
 }
