@@ -28,7 +28,7 @@ RUN git clone --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea
 # ╰――――――――――――――――――――╯
 WORKDIR /gitea
 # RUN TAGS="bindata" make build
-RUN make clean-all build
+RUN TAGS="bindata" make clean-all build
 # Begin env-to-ini build
 # RUN go build contrib/environment-to-ini/environment-to-ini.go
 
