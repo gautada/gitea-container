@@ -4,6 +4,9 @@
 # XCode - Project files 
 *.xcodeproj/
 
+# Nova - Editor files 
+*.nova/
+
 # Desktop Services Store - Custom view preferences
 .DS_Store
 
