@@ -1,0 +1,10 @@
+%privileged ALL = (ALL) NOPASSWD: /usr/sbin/crond
+%privileged ALL = (ALL) NOPASSWD: /usr/bin/container-backup
+%privileged ALL = (ALL) NOPASSWD: /etc/periodic/hourly/container-backup
+
+# Enable only for debugging
+# %privileged ALL = (ALL) NOPASSWD: /usr/bin/apt-get
+
+# For this container
+%privileged         ALL = (ALL) NOPASSWD: /usr/bin/gitea
+

@@ -9,11 +9,11 @@
 ENTRYPOINT_PARAMS="$@"
 . /etc/profile
 
-app_version() {
+container_version() {
  /usr/bin/gitea --version | awk -F ' ' '{print $3}'
 }
 
-app_entrypoint() {
+container_entrypoint() {
  log "-i" "entrypoint" "default"
  /usr/bin/pgrep gitea > /dev/null
  TEST=$?
