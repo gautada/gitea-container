@@ -4,33 +4,40 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        CONTAINER_VERSION: "1.19.3"
-        GITEA_VERSION: "1.19.3"
+        CONTAINER_VERSION: "1.21.3"
+        GITEA_VERSION: "1.21.3"
       context: .
-      dockerfile: Containerfile
-      no_cache: true
+      dockerfile: container.build
+      no_cache: true  
+      
       tags:
         - "gitea:build"
-    image: "gautada/gitea:build"
-    environment:
-      - SYSTEM_ENVIRONMENT=DEVELOPMENT
+        - "gautada/gitea:build"
+        - "gautada/gitea:latest"
+    image: "gautada/gitea:latest"
     ports:
       - "8080:8080"
     volumes:
-      - "container:/mnt/volumes/container"
-      - "backup:/mnt/volumes/backup"
-        
+      - "Container:/mnt/volumes/container"
+      - "Backup:/mnt/volumes/backup"
+      - "Configmaps:/mnt/volumes/configmaps"
+      - "Secrets:/mnt/volumes/Secrets"
+
+
 volumes:
-  container:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /Users/mada/Workspace/gitea/container-volume
-  backup:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /Users/mada/Workspace/gitea/backup-volume
-      
+  Container:
+    external: true
+    name: "Container"
+
+  Backup:
+    external: true
+    name: "Backup"
+
+  Configmaps:
+    external: true
+    name: "Configmaps"
+    
+  Secrets:
+    external: true
+    name: "Secrets"
+    
