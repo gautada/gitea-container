@@ -83,3 +83,86 @@ The official to list is kept in a [GitHub Issue List](https://github.com/gautada
 
 
 
+
+
+
+
+
+# Begin env-to-ini build
+# RUN go build contrib/environment-to-ini/environment-to-ini.go
+
+# ╭―------------------------------------------------------------------------╮
+# │                                                                         │
+# │ STAGE 3: gitea-container                                                │
+# │                                                                         │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION
+
+# ╭――――――――――――――――――――╮
+# │ METADATA           │
+# ╰――――――――――――――――――――╯
+LABEL source="https://github.com/gautada/gitea-container.git"
+LABEL maintainer="Adam Gautier <adam@gautier.org>"
+LABEL description="A gitea container"
+
+# ╭―
+# │ USER
+# ╰――――――――――――――――――――
+ARG USER=gitea
+RUN /usr/sbin/usermod -l $USER alpine
+RUN /usr/sbin/usermod -d /home/$USER -m $USER
+RUN /usr/sbin/groupmod -n $USER alpine
+RUN /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
+
+# ╭―
+# │ PRIVILEGES
+# ╰――――――――――――――――――――
+COPY privileges /etc/container/privileges
+
+# ╭―
+# │ BACKUP
+# ╰――――――――――――――――――――
+COPY backup /etc/container/backup
+
+# ╭―
+# │ ENTRYPOINT
+# ╰――――――――――――――――――――
+COPY entrypoint /etc/container/entrypoint
+
+# FOLDERS
+RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
+ && /bin/chown -R $USER:$USER /mnt/volumes/backup 
+ 
+# ╭――――――――――――――――――――╮
+# │ APPLICATION        │
+# ╰――――――――――――――――――――╯
+
+# /opt/gitea and /etc/gitea are needed for legacy support (mostly webhooks).
+RUN /bin/mkdir -p /etc/gitea /opt/gitea \
+ && /bin/ln -fsv /etc/container/app.ini /etc/gitea/app.ini \
+ && /bin/ln -fsv /mnt/volumes/configmaps/app.ini /etc/container/app.ini \
+ && /bin/ln -fsv /mnt/volumes/container/app.ini /mnt/volumes/configmaps/app.ini \
+ && /bin/ln -fsv /etc/container/app.ini /opt/gitea/app.ini
+ 
+RUN /sbin/apk add --no-cache bash git openssh-client
+COPY --from=src-gitea /gitea/gitea /usr/bin/gitea
+COPY --from=src-gitea /gitea/custom/conf/app.example.ini /etc/gitea/app.example.ini
+
+RUN /bin/mkdir -p /mnt/volumes/container/custom \
+ && /bin/mkdir -p /mnt/volumes/container/data \
+ && /bin/mkdir -p /mnt/volumes/container/log \
+ && /bin/mkdir -p /mnt/volumes/container/repos
+
+# ╭――――――――――――――――――――╮
+# │ SETTINGS           │
+# ╰――――――――――――――――――――╯
+USER $USER
+VOLUME /mnt/volumes/backup
+VOLUME /mnt/volumes/configmaps
+VOLUME /mnt/volumes/container
+EXPOSE 8080/tcp
+WORKDIR /home/$USER
+
+
+
+

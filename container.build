@@ -1,5 +1,4 @@
-ARG ALPINE_VERSION=3.16.2
-
+ARG ALPINE_VERSION=latest
 # │ STAGE: source gitea                                           
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 FROM gautada/alpine:$ALPINE_VERSION as src-gitea
@@ -13,25 +12,24 @@ ARG GITEA_BRANCH=v"$GITEA_VERSION"
 # ╭――――――――――――――――――――╮
 # │ PACKAGES           │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache bash build-base git go nodejs npm
+RUN /sbin/apk add --no-cache bash build-base git go nodejs npm
 
 # ╭――――――――――――――――――――╮
 # │ SOURCE             │
 # ╰――――――――――――――――――――╯
-RUN git clone --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea.git
+RUN git config --global advice.detachedHead false
+RUN git clone --verbose --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea.git
+
 
 # ╭――――――――――――――――――――╮
 # │ BUILD              │
 # ╰――――――――――――――――――――╯
 WORKDIR /gitea
-# RUN TAGS="bindata" make build
 RUN TAGS="bindata" make clean-all build
-# Begin env-to-ini build
-# RUN go build contrib/environment-to-ini/environment-to-ini.go
 
 # ╭―------------------------------------------------------------------------╮
 # │                                                                         │
-# │ STAGE 3: gitea-container                                                │
+# │ STAGE 2: gitea-container                                                │
 # │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION
@@ -43,39 +41,34 @@ LABEL source="https://github.com/gautada/gitea-container.git"
 LABEL maintainer="Adam Gautier <adam@gautier.org>"
 LABEL description="A gitea container"
 
-# │ PRIVILEGES           
+# ╭―
+# │ USER
+# ╰――――――――――――――――――――
+ARG USER=gitea
+RUN /usr/sbin/usermod -l $USER alpine
+RUN /usr/sbin/usermod -d /home/$USER -m $USER
+RUN /usr/sbin/groupmod -n $USER alpine
+RUN /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
+
+# ╭―
+# │ PRIVILEGES
 # ╰――――――――――――――――――――
 COPY privileges /etc/container/privileges
 
-# ╭――――――――――――――――――――╮
-# │ STANDARD CONFIG    │
-# ╰――――――――――――――――――――╯
-
-# USER:
-ARG USER=gitea
-
-ARG UID=1000
-ARG GID=1003
-RUN /usr/sbin/addgroup -g $GID $USER \
- && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
- && /usr/sbin/usermod -aG privileged $USER \
- && /bin/echo "$USER:$USER" | chpasswd
-
-
-# BACKUP:
+# ╭―
+# │ BACKUP
+# ╰――――――――――――――――――――
 COPY backup /etc/container/backup
 
-# ENTRYPOINT:
-RUN rm -v /etc/container/entrypoint
+# ╭―
+# │ ENTRYPOINT
+# ╰――――――――――――――――――――
 COPY entrypoint /etc/container/entrypoint
 
 # FOLDERS
 RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
  && /bin/chown -R $USER:$USER /mnt/volumes/backup 
  
- # && /bin/chown -R $USER:$USER /var/backup \
- # && /bin/chown -R $USER:$USER /tmp/backup
-
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
@@ -105,4 +98,3 @@ VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
 EXPOSE 8080/tcp
 WORKDIR /home/$USER
-
