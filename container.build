@@ -3,27 +3,14 @@ ARG ALPINE_VERSION=latest
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 FROM gautada/alpine:$ALPINE_VERSION as src-gitea
 
-# ╭――――――――――――――――――――╮
-# │ VERSION            │
-# ╰――――――――――――――――――――╯
 ARG GITEA_VERSION=1.21.3
 ARG GITEA_BRANCH=v"$GITEA_VERSION"
 
-# ╭――――――――――――――――――――╮
-# │ PACKAGES           │
-# ╰――――――――――――――――――――╯
 RUN /sbin/apk add --no-cache bash build-base git go nodejs npm
 
-# ╭――――――――――――――――――――╮
-# │ SOURCE             │
-# ╰――――――――――――――――――――╯
 RUN git config --global advice.detachedHead false
 RUN git clone --verbose --branch $GITEA_BRANCH --depth 1 https://github.com/go-gitea/gitea.git
 
-
-# ╭――――――――――――――――――――╮
-# │ BUILD              │
-# ╰――――――――――――――――――――╯
 WORKDIR /gitea
 RUN TAGS="bindata" make clean-all build
 
@@ -66,9 +53,11 @@ COPY backup /etc/container/backup
 COPY entrypoint /etc/container/entrypoint
 
 # FOLDERS
-RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
- && /bin/chown -R $USER:$USER /mnt/volumes/backup 
- 
+RUN /bin/chown -R $USER:$USER /mnt/volumes/container 
+RUN /bin/chown -R $USER:$USER /mnt/volumes/backup 
+RUN /bin/chown -R $USER:$USER /mnt/volumes/configmaps 
+RUN /bin/chown -R $USER:$USER /mnt/volumes/secrets  
+
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
