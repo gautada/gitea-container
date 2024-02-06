@@ -78,7 +78,7 @@ The official to list is kept in a [GitHub Issue List](https://github.com/gautada
 ## Notes
 
 - Change origin on git repo: `git remote set-url origin https://git.gautier.org/kubernetes/gitea-manifest.git `
-
+- 2024-02-05: Updating to use the hourly backup mechanism 
 
 
 
