@@ -52,12 +52,6 @@ COPY backup /etc/container/backup
 # ╰――――――――――――――――――――
 COPY entrypoint /etc/container/entrypoint
 
-# FOLDERS
-RUN /bin/chown -R $USER:$USER /mnt/volumes/container 
-RUN /bin/chown -R $USER:$USER /mnt/volumes/backup 
-RUN /bin/chown -R $USER:$USER /mnt/volumes/configmaps 
-RUN /bin/chown -R $USER:$USER /mnt/volumes/secrets  
-
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
@@ -85,5 +79,6 @@ USER $USER
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
+VOLUME /mnt/volumes/secrets
 EXPOSE 8080/tcp
 WORKDIR /home/$USER
