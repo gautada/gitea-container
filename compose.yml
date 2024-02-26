@@ -1,6 +1,9 @@
 version: "3.9"
 services:
   gitea:
+    dns:
+      - 10.0.4.200
+      - 10.0.4.201
     build:
       args:
         ALPINE_VERSION: "latest"
@@ -9,12 +12,13 @@ services:
       context: .
       dockerfile: container.build
       no_cache: true  
-      
       tags:
         - "gitea:build"
         - "gautada/gitea:build"
         - "gautada/gitea:latest"
     image: "gautada/gitea:latest"
+    hostname: gitea
+    container_name: gitea
     ports:
       - "8080:8080"
     volumes:
