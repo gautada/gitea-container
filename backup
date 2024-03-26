@@ -7,6 +7,6 @@
 
 container_backup() {
   /usr/bin/gitea --config /etc/gitea/app.ini --work-path /opt/gitea --custom-path /opt/gitea/custom dump
-  /usr/bin/unzip gitea-dump-*.zip
-  /bin/rm gitea-dump-*.zip
+  # /usr/bin/unzip gitea-dump-*.zip
+  # /bin/rm gitea-dump-*.zip
 }
