@@ -3,7 +3,8 @@ ARG ALPINE_VERSION=latest
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 FROM gautada/alpine:$ALPINE_VERSION as src-gitea
 
-ARG GITEA_VERSION=1.21.3
+ARG CONTAINER_VERSION=1.21.3
+ARG GITEA_VERSION=$CONTAINER_VERSION
 ARG GITEA_BRANCH=v"$GITEA_VERSION"
 
 RUN /sbin/apk add --no-cache bash build-base git go nodejs npm
